@@ -66,7 +66,6 @@ def getflags(flags):
 
     byte1 = bytes(flags[:1])
     byte2 = bytes(flags[1:2])
-
     rflags = ''
 
     QR = '1'
@@ -180,7 +179,6 @@ def buildresponse(data):
     for record in records:
         dnsbody += rectobytes(domainname, rectype,
                               record["ttl"], record["value"])
-
     return dnsheader + dnsquestion + dnsbody
 
 
