@@ -1,6 +1,7 @@
 import socket
 import glob
 import json
+import importlib
 
 port = 53
 ip = '127.0.0.1'
@@ -8,7 +9,7 @@ ip = '127.0.0.1'
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((ip, port))
 
-
+www=0
 def getquestiondomain(data):
 
     state = 0
@@ -36,7 +37,11 @@ def getquestiondomain(data):
         y += 1
 
     questiontype = data[y:y+2]
-
+    if 'www' in domainparts:
+        domainparts.remove('www')
+        global www
+        www=1
+  
     return (domainparts, questiontype)
 
 
@@ -63,7 +68,6 @@ zonedata = load_zones()
 
 
 def getflags(flags):
-
     byte1 = bytes(flags[:1])
     byte2 = bytes(flags[1:2])
     rflags = ''
@@ -94,7 +98,6 @@ def getflags(flags):
 def getzone(domain):
     global zonedata
     zone_name = '.'.join(domain)
-    print(zone_name)
     return zonedata[zone_name]
 
 
@@ -105,13 +108,14 @@ def getrecs(data):
         qt = 'a'
 
     zone = getzone(domain)
-
     return (zone[qt], qt, domain)
 
 
 def buildquestion(domainname, rectype):
     qbytes = b''
-
+    global www
+    if(www==1):
+        domainname.insert(0, 'www')
     for part in domainname:
         length = len(part)
         qbytes += bytes([length])
@@ -123,6 +127,7 @@ def buildquestion(domainname, rectype):
         qbytes += (1).to_bytes(2, byteorder='big')
 
     qbytes += (1).to_bytes(2, byteorder='big')
+    www=0
 
     return qbytes
 
@@ -147,7 +152,8 @@ def rectobytes(domainname, rectype, recttl, recval):
 
 
 def buildresponse(data):
-
+    global zonedata
+    zonedata=load_zones()
     # Transaction ID
     TransactionID = data[:2]
 
@@ -173,7 +179,7 @@ def buildresponse(data):
 
     # Get answer for query
     records, rectype, domainname = getrecs(data[12:])
-
+    
     dnsquestion = buildquestion(domainname, rectype)
 
     for record in records:
@@ -186,3 +192,4 @@ while 1:
     data, addr = sock.recvfrom(512)
     r = buildresponse(data)
     sock.sendto(r, addr)
+
