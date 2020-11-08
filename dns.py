@@ -9,7 +9,9 @@ ip = '127.0.0.1'
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((ip, port))
 
-www=0
+www = 0
+
+
 def getquestiondomain(data):
 
     state = 0
@@ -40,14 +42,15 @@ def getquestiondomain(data):
     if 'www' in domainparts:
         domainparts.remove('www')
         global www
-        www=1
-  
+        www = 1
     return (domainparts, questiontype)
 
 
 def load_zones():
     data, addr = sock.recvfrom(512)
     jsonzone = {}
+    reverse = 0
+    reverseAddr = ''
     zonefiles = glob.glob('zones/*.zone')
     domain, questiontype = getquestiondomain(data[12:])
     zone_name = '.'.join(domain)
@@ -56,11 +59,32 @@ def load_zones():
             data = json.load(zonedata)
             index = 0
             for i in data:
-                if(i["$origin"] == zone_name):
-                    index = data.index(i)
-                    break
-            zonename = data[index]["$origin"]
-            jsonzone[zonename] = data[index]
+                if(len(domain) == 5):
+                    reverse = 1
+                    a = len(i["$origin"])
+                    name = i["$origin"][0:a-13]
+                    compAdd = name.split('.')
+                    compAdd.reverse()
+                    newAdd = compAdd[1:]+compAdd[0:1]
+                    comparing = '.'.join(newAdd)
+                    reverseAddr = comparing
+                    if(zone_name == comparing):
+                        index = data.index(i)
+                        break
+                    else:
+                        reverse = 0
+                        reverseAddr = ''
+                        continue
+                else:
+                    if(i["$origin"] == zone_name):
+                        index = data.index(i)
+                        break
+            if reverse == 1:
+                zonename = reverseAddr
+                jsonzone[zonename] = data[index]
+            else:
+                zonename = data[index]["$origin"]
+                jsonzone[zonename] = data[index]
     return jsonzone
 
 
@@ -103,18 +127,19 @@ def getzone(domain):
 
 def getrecs(data):
     domain, questiontype = getquestiondomain(data)
+    zone = getzone(domain)
     qt = ''
     if questiontype == b'\x00\x01':
         qt = 'a'
-
-    zone = getzone(domain)
+    else:
+        qt = 'ptr'
     return (zone[qt], qt, domain)
 
 
 def buildquestion(domainname, rectype):
     qbytes = b''
     global www
-    if(www==1):
+    if(www == 1):
         domainname.insert(0, 'www')
     for part in domainname:
         length = len(part)
@@ -127,7 +152,7 @@ def buildquestion(domainname, rectype):
         qbytes += (1).to_bytes(2, byteorder='big')
 
     qbytes += (1).to_bytes(2, byteorder='big')
-    www=0
+    www = 0
 
     return qbytes
 
@@ -136,7 +161,7 @@ def rectobytes(domainname, rectype, recttl, recval):
 
     rbytes = b'\xc0\x0c'
 
-    if rectype == 'a':
+    if rectype == 'a' or rectype == 'ptr':
         rbytes = rbytes + bytes([0]) + bytes([1])
 
     rbytes = rbytes + bytes([0]) + bytes([1])
@@ -148,12 +173,20 @@ def rectobytes(domainname, rectype, recttl, recval):
 
         for part in recval.split('.'):
             rbytes += bytes([int(part)])
+
+    if rectype == 'ptr':
+        rbytes = rbytes + bytes([0]) + bytes([4])
+        val = bytes([0])
+        for part in recval.split('.'):
+            for char in part:
+                val += ord(char).to_bytes(1, byteorder='big')
+            rbytes += val
     return rbytes
 
 
 def buildresponse(data):
     global zonedata
-    zonedata=load_zones()
+    zonedata = load_zones()
     # Transaction ID
     TransactionID = data[:2]
 
@@ -179,12 +212,18 @@ def buildresponse(data):
 
     # Get answer for query
     records, rectype, domainname = getrecs(data[12:])
-    
-    dnsquestion = buildquestion(domainname, rectype)
+    print(records, rectype, domainname)
 
-    for record in records:
-        dnsbody += rectobytes(domainname, rectype,
-                              record["ttl"], record["value"])
+    dnsquestion = buildquestion(domainname, rectype)
+    if rectype == 'a':
+        for record in records:
+            dnsbody += rectobytes(domainname, rectype,
+                                  record["ttl"], record["value"])
+    if rectype == 'ptr':
+        for record in records:
+            dnsbody += rectobytes(domainname, rectype,
+                                  record["ttl"], record["value"])
+    print(dnsbody)
     return dnsheader + dnsquestion + dnsbody
 
 
@@ -192,4 +231,3 @@ while 1:
     data, addr = sock.recvfrom(512)
     r = buildresponse(data)
     sock.sendto(r, addr)
-

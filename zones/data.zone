@@ -24,7 +24,7 @@
     ]
 },
 {
-    "$origin": "www.google.com.",
+    "$origin": "google.com.",
     "$ttl": 3600,
     "soa": {
         "mname": "ns1.howcode.org.",
@@ -41,15 +41,11 @@
     ],
     "a": [
         { "name": "@", "ttl": 400, "value": "255.255.255.255" },
-        { "name": "www", "ttl": 400, "value": "127.0.0.1" },
-        { "name": "google", "ttl": 400, "value": "127.0.0.1" },
+        { "name": "@", "ttl": 400, "value": "127.0.0.1" },
+        { "name": "@", "ttl": 400, "value": "127.0.0.1" },
         { "name": "@", "ttl": 400, "value": "127.0.0.1" },
         { "name": "@", "ttl": 75, "value": "216.58.221.46" },
         { "name": "@", "ttl": 400, "value": "10.10.10.10" }
-    ],
-    "cname":[
-        {name:"google", alias:""},
-        {name:"", alias:""}        
     ]
 },
 {
@@ -70,14 +66,14 @@
     ],
     "a": [
         { "name": "@", "ttl": 400, "value": "255.255.255.255" },
-        { "name": "www", "ttl": 400, "value": "127.0.0.1" },
-        { "name": "ankit", "ttl": 400, "value": "127.0.0.1" },
+        { "name": "@", "ttl": 400, "value": "127.0.0.1" },
+        { "name": "@", "ttl": 400, "value": "127.0.0.1" },
         { "name": "@", "ttl": 400, "value": "127.0.0.1" },
         { "name": "@", "ttl": 400, "value": "10.10.10.10" }
     ]
 },
 {
-	"$origin": "0.168.192.IN-ADDR.ARPA.",
+	"$origin": "1.0.168.192.in-addr.arpa.",
 	"$ttl": 3600,
 	"soa": {
 		"mname": "NS1.NAMESERVER.NET.",
@@ -93,8 +89,8 @@
       { "host": "NS2.NAMESERVER.NET." }
   ],
   "ptr":[
-      { "name": 1, "host": "HOST1.MYDOMAIN.COM." },
-      { "name": 2, "host": "HOST2.MYDOMAIN.COM." }
+      { "name": "@","ttl": 400, "value": "HOST1.MYDOMAIN.COM." },
+      { "name": "@","ttl": 400, "value": "HOST2.MYDOMAIN.COM." }
   ]
 }
 ]
