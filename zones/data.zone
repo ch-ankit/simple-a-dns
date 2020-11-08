@@ -24,7 +24,7 @@
     ]
 },
 {
-    "$origin": "www.google.com.",
+    "$origin": "google.com.",
     "$ttl": 3600,
     "soa": {
         "mname": "ns1.howcode.org.",
@@ -41,15 +41,11 @@
     ],
     "a": [
         { "name": "@", "ttl": 400, "value": "255.255.255.255" },
-        { "name": "www", "ttl": 400, "value": "127.0.0.1" },
-        { "name": "google", "ttl": 400, "value": "127.0.0.1" },
+        { "name": "@", "ttl": 400, "value": "127.0.0.1" },
+        { "name": "@", "ttl": 400, "value": "127.0.0.1" },
         { "name": "@", "ttl": 400, "value": "127.0.0.1" },
         { "name": "@", "ttl": 75, "value": "216.58.221.46" },
         { "name": "@", "ttl": 400, "value": "10.10.10.10" }
-    ],
-    "cname":[
-        {name:"google", alias:""},
-        {name:"", alias:""}        
     ]
 },
 {
@@ -70,31 +66,10 @@
     ],
     "a": [
         { "name": "@", "ttl": 400, "value": "255.255.255.255" },
-        { "name": "www", "ttl": 400, "value": "127.0.0.1" },
-        { "name": "ankit", "ttl": 400, "value": "127.0.0.1" },
+        { "name": "@", "ttl": 400, "value": "127.0.0.1" },
+        { "name": "@", "ttl": 400, "value": "127.0.0.1" },
         { "name": "@", "ttl": 400, "value": "127.0.0.1" },
         { "name": "@", "ttl": 400, "value": "10.10.10.10" }
     ]
-},
-{
-	"$origin": "0.168.192.IN-ADDR.ARPA.",
-	"$ttl": 3600,
-	"soa": {
-		"mname": "NS1.NAMESERVER.NET.",
-		"rname": "HOSTMASTER.MYDOMAIN.COM.",
-		"serial": "{time}",
-		"refresh": 3600,
-		"retry": 600,
-		"expire": 604800,
-		"minimum": 86400
-	},
-  "ns": [
-      { "host": "NS1.NAMESERVER.NET." },
-      { "host": "NS2.NAMESERVER.NET." }
-  ],
-  "ptr":[
-      { "name": 1, "host": "HOST1.MYDOMAIN.COM." },
-      { "name": 2, "host": "HOST2.MYDOMAIN.COM." }
-  ]
 }
 ]
